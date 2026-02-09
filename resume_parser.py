@@ -1,5 +1,7 @@
 import pdfplumber
 import re 
+from nlp_extractor import extract_candidate_terms
+
 
 def extract_text_from_pdf(file_path):
     page_texts = []
@@ -16,9 +18,14 @@ def clean_text(text:str)-> str:
     text=' '.join(text.split())
     return text
 
-def extract_skills(text: str, skills_list: set) -> list:
+def extract_skills_nlp(text: str, skills_list: set) -> list:
     found_skills = set()
     for skill in skills_list:
         if skill in text:
             found_skills.add(skill)
+    candidates=extract_candidate_terms(text)
+    for candidate in candidates:
+        for skill in skills_list:
+            if candidate == skill or skill in candidate or candidate in skill:
+                found_skills.add(skill)
     return list(found_skills)
