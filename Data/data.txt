@@ -1,0 +1,30 @@
+python
+java
+sql
+docker
+aws
+git
+linux
+selenium
+javascript
+typescript
+react
+nodejs
+machine learning
+test automation
+kubernetes
+rest api
+microservices
+postgresql
+mongodb
+mysql
+cicd
+agile
+scrum
+c++
+go
+azure
+google cloud
+oop
+data structures
+algorithms

@@ -18,6 +18,9 @@ def clean_text(text:str)-> str:
     text=' '.join(text.split())
     return text
 
+
+
+
 def extract_skills_nlp(text: str, skills_list: set) -> list:
     found_skills = set()
     for skill in skills_list:
