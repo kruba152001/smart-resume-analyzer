@@ -1,89 +1,120 @@
 import streamlit as st
 import tempfile
 import os
-from resume_parser import clean_text, extract_skills_nlp, extract_text_from_pdf
-from nlp_extractor import extract_candidate_terms , filter_candidate_terms
+import pandas as pd
 
+from llm_client import generate_resume_suggestions
+from resume_parser import clean_text, extract_text_from_pdf
 from nlp_extractor import extract_skills_from_text
+from skill_scorer import compute_skill_weights, compute_weighted_score
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="centered")
-
 st.title("🧠 Smart Resume Analyzer")
 st.write("Upload your resume and see how well it matches the job requirements.")
+
 st.subheader("Paste Job Description")
 job_description = st.text_area("Enter the job description here", height=200)
-uploaded_file = st.file_uploader("Upload your resume (PDF)", type=["pdf"])
+uploaded_file   = st.file_uploader("Upload your resume (PDF)", type=["pdf"])
 
 if uploaded_file is not None:
-    # Save uploaded file to a temporary file
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(uploaded_file.read())
         temp_path = tmp_file.name
 
     st.success("Resume uploaded successfully!")
 
-    # Now process the resume
-    raw_text = extract_text_from_pdf(temp_path)
+    raw_text     = extract_text_from_pdf(temp_path)
     cleaned_text = clean_text(raw_text)
-    # Make sure user entered a Job Description
+
     if not job_description.strip():
         st.warning("Please paste a Job Description to analyze against.")
         st.stop()
 
-    # Clean the job description text
-    cleaned_jd = clean_text(job_description)
+    cleaned_jd    = clean_text(job_description)
+    job_skills    = extract_skills_from_text(cleaned_jd)
 
-    # Extract candidate skills from Job Description using NLP
-    # raw_jd_terms = extract_candidate_terms(cleaned_jd)
-    # job_skills = filter_candidate_terms(raw_jd_terms)
-    job_skills = extract_skills_from_text(cleaned_jd)
-
-    # Safety check: if NLP finds nothing useful
     if not job_skills:
-        st.warning("Could not extract skills from the Job Description. Please provide a more detailed JD.")
+        st.warning("Could not extract skills from the JD. Please provide a more detailed JD.")
         st.stop()
 
-
-    # Define job skills (for now, same as before)
-    # job_skills = {
-    #     "python", "java", "sql", "javascript", "html", "css",
-    #     "aws", "docker", "kubernetes", "git"
-    # }
-
-    # matched_skills = extract_skills_nlp(cleaned_text, job_skills)
-    resume_skills = extract_skills_from_text(cleaned_text)
-
+    resume_skills  = extract_skills_from_text(cleaned_text)
     matched_skills = resume_skills.intersection(job_skills)
+    missing_skills = job_skills - matched_skills
 
-    # Calculate match percentage
-    match_percentage = (len(matched_skills) / len(job_skills)) * 100
+    # ── SCORING ──────────────────────────────────────────
+    skill_weights = compute_skill_weights(job_description, job_skills)
+    score_data    = compute_weighted_score(matched_skills, skill_weights)
 
-    # Calculate missing skills
-    missing_skills = job_skills - set(matched_skills)
+    weighted_pct    = score_data["weighted_pct"]
+    score_out_of_10 = round(weighted_pct / 10, 1)
 
-    # Decision message
-    if match_percentage >= 70:
-        decision_message = "The candidate is a good fit for the job."
-    elif match_percentage >= 40:
-        decision_message = "The candidate is a partial match and needs improvement."
+    # ── DECISION STRING ───────────────────────────────────
+    if weighted_pct >= 70:
+        decision = "🟢 Strong match — good fit for this role."
+    elif weighted_pct >= 40:
+        decision = "🟡 Partial match — some gaps to address."
     else:
-        decision_message = "The candidate is a low match for the job."
+        decision = "🔴 Low match — significant skill gaps."
 
-    # Display results
-    st.subheader("Results")
-    st.subheader("Matched Skills")
-    for skill in sorted(matched_skills):
-        st.write(f"• {skill}")
+    # ── DISPLAY SCORE ─────────────────────────────────────
+    st.subheader("📊 Match Score")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Match Score", f"{score_out_of_10} / 10")
+    with col2:
+        st.metric("Match Percentage", f"{weighted_pct}%")
 
-    st.subheader("Missing Skills")
-    if missing_skills:
-        for skill in sorted(missing_skills):
-            st.write(f"• {skill}")
+    st.info(decision)    # ← renders the decision string in a blue box
+
+    # ── PRIORITY LABEL ────────────────────────────────────
+    def get_priority_label(weight: float) -> str:
+        if weight >= 3.0:
+            return "🔴 Critical"
+        elif weight >= 1.5:
+            return "🟡 Important"
+        else:
+            return "🟢 Good to have"
+
+    # ── SKILL BREAKDOWN TABLE ─────────────────────────────
+    st.subheader("🔍 Skill Breakdown")
+    rows = []
+    for skill, weight in sorted(
+        score_data["weights"].items(),
+        key=lambda x: x[1],
+        reverse=True
+    ):
+        status = "✅ Matched" if skill in matched_skills else "❌ Missing"
+        rows.append({
+            "Skill"   : skill,
+            "Priority": get_priority_label(weight),
+            "Status"  : status,
+        })
+
+    st.dataframe(
+        pd.DataFrame(rows),
+        width="stretch",
+        hide_index=True
+    )
+
+    # ── TOP MISSING SKILLS ────────────────────────────────
+    st.subheader("🎯 Focus On These Missing Skills First")
+    if score_data["top_missing"]:
+        for i, skill in enumerate(score_data["top_missing"][:5], 1):
+            weight = score_data["weights"].get(skill, 0)
+            label  = get_priority_label(weight)
+            st.write(f"{i}. **{skill}** — {label}")
     else:
-        st.write("None 🎉")
-    st.write(f"Matched Skills Percentage: {match_percentage:.2f}%")
-   
-    st.write("Decision:", decision_message)
+        st.success("You matched all skills! 🎉")
 
-    # Clean up temp file
+    # ── LLM SUGGESTIONS ───────────────────────────────────
+    suggestions = generate_resume_suggestions(
+        matched_skills,
+        missing_skills,
+        job_description,
+        raw_text
+    )
+    st.subheader("💡 How to Improve Your Resume")
+    st.write(suggestions)
+
     os.remove(temp_path)

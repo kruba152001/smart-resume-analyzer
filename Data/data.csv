@@ -1,0 +1,108 @@
+skill,category
+python,core_language
+java,core_language
+javascript,core_language
+typescript,core_language
+c++,core_language
+c#,core_language
+go,core_language
+rust,core_language
+kotlin,core_language
+swift,core_language
+scala,core_language
+ruby,core_language
+php,core_language
+r,core_language
+react,framework
+angular,framework
+vue.js,framework
+next.js,framework
+node.js,framework
+django,framework
+flask,framework
+fastapi,framework
+spring boot,framework
+express.js,framework
+tailwind css,framework
+bootstrap,framework
+html,framework
+css,framework
+sass,framework
+machine learning,ai_ml
+deep learning,ai_ml
+natural language processing,ai_ml
+computer vision,ai_ml
+large language models,ai_ml
+reinforcement learning,ai_ml
+tensorflow,ai_ml
+pytorch,ai_ml
+keras,ai_ml
+scikit-learn,ai_ml
+hugging face,ai_ml
+opencv,ai_ml
+pandas,ai_ml
+numpy,ai_ml
+scipy,ai_ml
+matplotlib,ai_ml
+seaborn,ai_ml
+plotly,ai_ml
+amazon web services,cloud
+google cloud platform,cloud
+microsoft azure,cloud
+terraform,cloud
+ansible,cloud
+docker,devops
+kubernetes,devops
+jenkins,devops
+ci/cd,devops
+nginx,devops
+apache,devops
+linux,devops
+bash,devops
+sql,database
+postgresql,database
+mongodb,database
+mysql,database
+sqlite,database
+redis,database
+elasticsearch,database
+cassandra,database
+oracle,database
+dynamodb,database
+firebase,database
+supabase,database
+selenium,testing
+pytest,testing
+junit,testing
+cypress,testing
+playwright,testing
+test automation,testing
+postman,testing
+git,tool
+jira,tool
+confluence,tool
+power bi,tool
+tableau,tool
+excel,tool
+spark,tool
+hadoop,tool
+airflow,tool
+kafka,tool
+dbt,tool
+snowflake,tool
+agile,soft_process
+scrum,soft_process
+kanban,soft_process
+data structures,fundamentals
+algorithms,fundamentals
+object oriented programming,fundamentals
+system design,fundamentals
+design patterns,fundamentals
+rest api,fundamentals
+graphql,fundamentals
+grpc,fundamentals
+microservices,fundamentals
+websockets,fundamentals
+oauth,fundamentals
+jwt,fundamentals
+oop,fundamentals
