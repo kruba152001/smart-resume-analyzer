@@ -1,7 +1,9 @@
-pdfplumber
-spacy
 streamlit
-huggingface-hub
-python-dotenv
+spacy==3.7.2
+thinc==8.2.2
+pydantic==1.10.13
+numpy==1.26.4
+pdfplumber
 pandas
+scikit-learn
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
