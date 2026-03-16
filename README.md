@@ -1,123 +1,140 @@
-🧠 Smart Resume Analyzer
-A Python-based Smart Resume Analyzer that compares a resume against job-required skills, calculates a match percentage, highlights missing skills, and gives a simple decision message on candidate fit.
+# 🧠 Smart Resume Analyser
 
-This project is built step by step to demonstrate:
+An AI-powered resume analyser that compares your resume against a job description,
+scores your skill match, and gives LLM-powered suggestions to improve your resume.
 
-Text extraction from PDFs
+Built as a portfolio project for my QE → AI Engineer transition.
 
-Text preprocessing (cleaning)
+🔗 **Live Demo**: [your-streamlit-url-here]
 
-Skill matching using Python sets
+---
 
-Basic scoring logic
+## ✨ Features
 
-Simple decision-making logic
+- 📄 PDF resume upload and text extraction
+- 🧹 Text cleaning and alias normalization (JS → javascript, k8s → kubernetes)
+- 🧠 NLP-based skill extraction using spaCy PhraseMatcher
+- 📊 Weighted skill scoring (frequency × position × category)
+- 💡 LLM-powered improvement suggestions via HuggingFace
+- 🎯 Prioritised missing skills (Critical / Important / Good to have)
+- 📈 Evaluation metrics: Precision, Recall, F1 = 0.9808
 
-(Upcoming) NLP improvements and UI
+---
 
-✨ Features
-📄 Extracts text from resume PDF
+## 🏗️ System Architecture
+```
+Resume PDF ──→ resume_parser.py ──→ aliases.py ──→ nlp_extractor.py
+                                                          ↑
+Job Description ──────────────────────────────────────────┘
+                                                          ↓
+                                                   skill_scorer.py
+                                                   (freq × pos × cat)
+                                                          ↓
+                                                    llm_client.py
+                                                          ↓
+                                                       ui.py
+                                                  (Streamlit frontend)
 
-🧹 Cleans and normalizes text for analysis
+evaluator.py → developer tool (precision, recall, F1) — not shown in UI
+```
 
-🧠 Matches resume skills against job skills
+---
 
-📊 Calculates Match Percentage
+## 🛠️ Tech Stack
 
-❌ Shows Missing Skills
+| Layer | Technology |
+|---|---|
+| Language | Python 3.11 |
+| NLP | spaCy, PhraseMatcher |
+| UI | Streamlit |
+| LLM | HuggingFace Inference API |
+| PDF Parsing | pdfplumber |
+| Data | skills.csv (95+ skills with categories) |
+| Containerization | Docker |
+| Deployment | Streamlit Cloud |
 
-✅ Gives a Decision Message:
+---
 
-Good fit
-
-Partial match
-
-Low match
-
-🛠 Tech Stack
-Python 3
-
-pdfplumber (for PDF text extraction)
-
-re (for text cleaning)
-
-(Planned) spaCy for NLP
-
-(Planned) Streamlit for UI
-
-📂 Project Structure
-smart-resume-analyzer/
+## 📂 Project Structure
+```
+smart-resume-analyser/
 │
-├── app.py
-├── resume_parser.py
-├── text_cleaner.py
-├── skill_extractor.py
-├── requirements.txt
-├── sample_resumes/
-│ └── sample_resume.pdf
-└── README.md
-🚀 How It Works
-Reads a resume PDF
+├── ui.py                 # Streamlit frontend
+├── resume_parser.py      # PDF extraction + text cleaning
+├── nlp_extractor.py      # spaCy PhraseMatcher skill extraction
+├── aliases.py            # Alias normalization (js → javascript)
+├── skill_scorer.py       # Weighted scoring system
+├── llm_client.py         # HuggingFace LLM suggestions
+├── evaluator.py          # Precision, Recall, F1 evaluation
+├── Dockerfile            # Container setup
+├── requirements.txt      # Dependencies
+└── Data/
+    └── skills.csv        # 95+ skills with categories
+```
 
-Extracts raw text
+---
 
-Cleans the text (lowercase, remove symbols, fix spaces)
+## 🚀 How to Run
 
-Matches skills against a predefined job skill set
+### Option 1 — Local
+```bash
+git clone https://github.com/kruba152001/smart-resume-analyzer
+cd smart-resume-analyzer
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+streamlit run ui.py
+```
 
-Calculates match percentage
+### Option 2 — Docker
+```bash
+docker build -t smart-resume-analyser .
+docker run -p 8501:8501 --env-file .env smart-resume-analyser
+```
 
-Finds missing skills
+Then open: `http://localhost:8501`
 
-Prints a decision message based on the score
+---
 
-▶️ How to Run
+## 🔑 Environment Variables
 
-1. Clone the repository
-   git clone <your-repo-url>
-   cd smart-resume-analyzer
-2. Create and activate virtual environment
-   python -m venv venv
-   venv\Scripts\activate # Windows
+Create a `.env` file:
+```
+HF_TOKEN=your_huggingface_token_here
+```
 
-# or
+---
 
-source venv/bin/activate # Mac/Linux 3. Install dependencies
-pip install -r requirements.txt 4. Add your resume
-Put your resume PDF inside:
+## 📊 Evaluation Results
 
-sample_resumes/
-And update the path in app.py if needed:
+Run `python evaluator.py` to measure extractor quality:
+```
+Average Precision : 1.0
+Average Recall    : 0.9643
+Average F1 Score  : 0.9808
+```
 
-resume_path = "sample_resumes/sample_resume.pdf" 5. Run the app
-python app.py
-📊 Example Output
-Matched Skills: {'python', 'java', 'sql', 'aws', 'docker', 'html', 'css', 'javascript'}
-Matched Skills Percentage: 90.00%
-Missing Skills: {'kubernetes'}
-Decision: The candidate is a good fit for the job.
-🛣 Roadmap (Planned Improvements)
-Improve skill extraction using spaCy (NLP)
+---
 
-Support job description input instead of hardcoded skills
+## 🛣️ What I Learned
 
-Add Streamlit UI for file upload and results display
+- NLP pipeline design with spaCy PhraseMatcher
+- Multi-signal scoring systems (frequency × position × category)
+- Evaluation metrics: precision, recall, F1
+- Docker containerization
+- Streamlit Cloud deployment
+- Clean architecture: separating data from config
 
-Better formatting and reports
+---
 
-Export results to PDF/CSV
+## 🎯 Why This Project?
 
-🎯 Why This Project?
-This project is built to:
+Built to demonstrate real AI Engineering skills:
+- End-to-end NLP pipeline
+- Data-driven design (skills.csv as single source of truth)
+- Measurable quality (F1 = 0.9808)
+- Production-ready (Dockerized + deployed)
 
-Learn AI/NLP fundamentals
+---
 
-Understand real-world text preprocessing
-
-Build an end-to-end analysis pipeline
-
-Create a portfolio-ready, explainable project
-
-🙌 Author
-Built by Kruba
-Learning AI, Python, and building real-world projects step by step.
+👨‍💻 Built by Kruba — QE → AI Engineer transition project
+```
