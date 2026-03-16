@@ -5,7 +5,7 @@ scores your skill match, and gives LLM-powered suggestions to improve your resum
 
 Built as a portfolio project for my QE → AI Engineer transition.
 
-🔗 **Live Demo**: [your-streamlit-url-here]
+🔗 **Live Demo**: https://smart-resume-analyzer-emphabwaavdmba8de9vwaf.streamlit.app/
 
 ---
 
@@ -87,7 +87,7 @@ streamlit run ui.py
 
 ### Option 2 — Docker
 ```bash
-docker build -t smart-resume-analyser .
+docker build -t smart-resume-analyser.
 docker run -p 8501:8501 --env-file .env smart-resume-analyser
 ```
 
@@ -108,9 +108,9 @@ HF_TOKEN=your_huggingface_token_here
 
 Run `python evaluator.py` to measure extractor quality:
 ```
-Average Precision : 1.0
-Average Recall    : 0.9643
-Average F1 Score  : 0.9808
+Average Precision: 1.0
+Average Recall   : 0.9643
+Average F1 Score : 0.9808
 ```
 
 ---
